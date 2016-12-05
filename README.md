@@ -27,5 +27,7 @@ foodchain.define(['get:user'], 'get:user-products', {
   return {factory, request};
 });
 
-foodchain('get:user-products', {userId: 'ae563h7e'}).then(({sid}) => console.log(sid)); // ae563h7e
+foodchain('get:user-products', {userId: 'ae563h7e'}).then(products => products.forEach(
+  product => console.log(product.sid)
+));
 ```
