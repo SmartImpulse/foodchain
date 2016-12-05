@@ -3,6 +3,7 @@ Describe resource dependencies
 
 ```js
 const foodchain = require('foodchain');
+const renameKeys = require('object-rename-keys');
 
 const bootTime = Date.now();
 
@@ -21,7 +22,7 @@ foodchain.define(['get:user'], 'get:user-products', {
     shouldSaveCache: true,
     shouldUseCache: () => Date.now() - bootTime < 60000, // expires every minutes,
     exec: ({userId}) => this.get(`/api/users/${userId}/products`),
-    parse: (product) => foodchain.move({sid: 'id'}),
+    parse: (product) => renameKeys({sid: 'id'}),
   });
 
   return {factory, request};
