@@ -6,7 +6,7 @@ const foodchain = require('foodchain');
 
 const bootTime = Date.now();
 
-foodchain.define('get-user', {
+foodchain.define('get:user', {
   const factory = foodchain.createFactory(({userId}) => `client-${userId}`);
   const request = foodchain.createRequest((client, ({userId}) => client.get(`/api/users/${userId}`));
 
@@ -15,7 +15,7 @@ foodchain.define('get-user', {
 
 
 // products needs user
-foodchain.define(['get-user'], 'get-user-products', {
+foodchain.define(['get:user'], 'get:user-products', {
   const factory = foodchain.createFactory(({userId}) => `client-${userId}`);
 
   const request = foodchain.createRequest({
@@ -25,10 +25,17 @@ foodchain.define(['get-user'], 'get-user-products', {
     exec({userId}) {
       return this.get(`/api/users/${userId}/products`);
     },
+    
+    parse(product) {
+      product.sid = product.id;
+      delete product.id;
+      return product;
+    }
   });
 
   return {factory, request};
 });
 
+foodchain('get:user-products', {userId: 'ae563h7e', uselessData: 'foobar'});
 
 ```
