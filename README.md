@@ -17,7 +17,6 @@ foodchain.define('get:user', {
 // products needs user
 foodchain.define(['get:user'], 'get:user-products', {
   const factory = foodchain.createFactory(({userId}) => `client-${userId}`);
-
   const request = foodchain.createRequest({
     shouldSaveCache: true,
     shouldUseCache: () => Date.now() - bootTime < 60000, // expires every minutes,
