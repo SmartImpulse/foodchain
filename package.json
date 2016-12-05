@@ -21,6 +21,9 @@
   },
   "homepage": "https://github.com/SmartImpulse/foodchain#readme",
   "dependencies": {
+    "lawnchair": "0.6.4",
+    "superagent": "3.1.0",
+    "superagent-promise": "1.1.0"
   },
   "devDependencies": {
     "babel-cli": "6.10.1",

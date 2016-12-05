@@ -21,7 +21,7 @@ foodchain.define(['get:user'], 'get:user-products', {
   const request = foodchain.createRequest({
     shouldSaveCache: true,
     shouldUseCache: () => Date.now() - bootTime < 60000, // expires every minutes,
-    exec: ({userId}) => this.get(`/api/users/${userId}/products`),
+    exec: (client, {userId}) => client.get(`/api/users/${userId}/products`),
     parse: (product) => renameKeys({sid: 'id'}),
   });
 

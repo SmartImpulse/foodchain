@@ -5,10 +5,11 @@ class Factory {
     this.requests = {};
   }
 
-  getOrCreate(context, request) {
-    const id = this.idGenerator(context);
+  getOrCreate(name, context, request) {
+    const generated = this.idGenerator(context);
+    const id = !!generated ? generated : 'default';
 
-    if (! (id in this.requests)) this.requests[id] = request(context);
+    if (! (id in this.requests)) this.requests[id] = request(name, context);
 
     return this.requests[id];
   }
