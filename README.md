@@ -2,30 +2,30 @@
 Describe resource dependencies
 
 ```js
-const foodchain = require('foodchain');
+const {request, define} = require('foodchain');
 const renameKeys = require('object-rename-keys');
 
 const bootTime = Date.now();
 
-foodchain.define('get:user', {
-  const factory = foodchain.createFactory(({userId}) => `client-${userId}`);
-  const request = foodchain.createRequest((client, ({userId}) => client.get(`/api/users/${userId}`));
+define('get:user', () => {
+  const factory = ({userId}) => `client-${userId}`;
+  const fetcher = ({userId}) => request.get(`/api/users/${userId}`);
 
-  return {factory, request};
+  return {factory, fetcher};
 });
 
 
 // products needs user
-foodchain.define(['get:user'], 'get:user-products', {
-  const factory = foodchain.createFactory(({userId}) => `client-${userId}`);
-  const request = foodchain.createRequest({
+define(['get:user'], 'get:user-products', () => {
+  const factory = ({userId}) => `client-${userId}`;
+  const fetcher = ({userId}) => client.get(`/api/users/${userId}/products`);
+  const parser = (product) => renameKeys({sid: 'id'});
+  const lifecycle = {
     shouldSaveCache: true,
     shouldUseCache: () => Date.now() - bootTime < 60000, // expires every minutes,
-    exec: (client, {userId}) => client.get(`/api/users/${userId}/products`),
-    parse: (product) => renameKeys({sid: 'id'}),
-  });
+  };
 
-  return {factory, request};
+  return {factory, fetcher, parser, lifecycle};
 });
 
 foodchain('get:user-products', {userId: 'ae563h7e'}).then(products => products.forEach(
