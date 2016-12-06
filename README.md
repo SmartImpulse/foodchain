@@ -17,8 +17,8 @@ define('get:user', () => {
 
 // products needs user
 define(['get:user'], 'get:user-products', () => {
-  const factory = ({userId}) => `client-${userId}`;
-  const fetcher = ({userId}) => client.get(`/api/users/${userId}/products`);
+  const factory = ({userId}) => `products-${userId}`;
+  const fetcher = ({userId}) => request.get(`/api/users/${userId}/products`);
   const parser = (product) => renameKeys({sid: 'id'});
   const lifecycle = {
     shouldSaveCache: true,
