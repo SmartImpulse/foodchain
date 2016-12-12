@@ -12,14 +12,14 @@ const resultsExpire = duration => ({
 });
 
 define('get:user', Object.assign({
-  factory: ({userId}) => `client-${userId}`,
+  factory: ({userId}) => `user-${userId}`,
   request: ({userId}) => request.get(`/api/users/${userId}`),
 }, resultsExpire(60000)));
 
 
 define(['get:user'], 'get:user-products', {
-  factory: ({userId}) => `client-${userId}`,
-  request: ({userId}) => request.get(`/api/users/${userId}`),
+  factory: ({userId}) => `products-${userId}`,
+  request: ({userId}) => request.get(`/api/users/${userId}/products`),
 }, resultsExpire(10000)));
 
 foodchain('get:user-products', {userId: 'ae563h7e'}).then(products => products.forEach(
