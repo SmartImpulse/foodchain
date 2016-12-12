@@ -1,5 +1,17 @@
 const request = require('superagent');
 
+class Request {
+
+  constructor(generator) {
+    this.generator = generator;
+  }
+
+  exec(context) {
+    return this.generator(context);
+  }
+
+}
+
 
 class NoRequest {
 
@@ -12,10 +24,18 @@ class NoRequest {
 
 
 const createRequest = (id, spec) => {
-  if (!spec) throw new NoRequest(id);
-  if (spec instanceof request.Request) return () => spec;
+  let generator = spec;
 
-  return spec;
+  if (!spec) throw new NoRequest(id);
+  if (spec instanceof request.Request) generator = () => spec;
+
+  return class extends Request {
+
+    constructor() {
+      super(generator);
+    }
+
+  };
 };
 
 

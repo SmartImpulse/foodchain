@@ -14,7 +14,7 @@ const exec = (id, context) => {
   const {spec} = def[id];
   const request = spec.factory.getOrCreate(context, spec.request);
 
-  return new Promise((resolve, reject) => request.end((err, res) => {
+  return new Promise((resolve, reject) => request.exec(context).end((err, res) => {
     if (!!err) return reject(err);
 
     resolve(res.body);
