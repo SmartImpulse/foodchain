@@ -5,11 +5,11 @@ class Factory {
     this.requests = {};
   }
 
-  getOrCreate(name, context, request) {
+  getOrCreate(context, request) {
     const generated = this.idGenerator(context);
     const id = !!generated ? generated : 'default';
 
-    if (! (id in this.requests)) this.requests[id] = request(name, context);
+    if (! (id in this.requests)) this.requests[id] = request(context);
 
     return this.requests[id];
   }
@@ -17,10 +17,14 @@ class Factory {
 }
 
 
-exports.createFactory = spec => {
+exports.createFactory = (spec) => {
   let idGenerator = spec;
 
-  if (typeof idGenerator === 'string') idGenerator = () => spec;
+  if (!spec) {
+    idGenerator = () => 'default';
+  } else if (typeof idGenerator === 'string') {
+    idGenerator = () => spec;
+  }
 
   return new Factory(idGenerator);
 };
