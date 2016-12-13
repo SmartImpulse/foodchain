@@ -9,16 +9,35 @@ const proxy = (id, spec) => ({
   request: createRequest(id, spec.request),
 });
 
-
-const exec = (id, context) => {
+const createGenerator = (id, context) => {
   const {spec} = def[id];
   const request = spec.factory.getOrCreate(context, spec.request);
 
-  return new Promise((resolve, reject) => request.exec(context).end((err, res) => {
-    if (!!err) return reject(err);
+  return () => request.resolve(context);
+};
 
-    resolve(res.body);
-  }));
+const resolveDependencies = (id, context) => {
+  const {dependencies} = def[id];
+  let promises = [];
+
+  for (const depId of dependencies) {
+    promises = promises.concat(resolveDependencies(depId, context));
+    promises.push(createGenerator(depId, context));
+  }
+
+  return promises;
+};
+
+const callDependencies = (id, context) => Promise.all(
+  resolveDependencies(id, context).map(generator => generator())
+);
+
+const exec = (id, context) => {
+  const generator = createGenerator(id, context);
+
+  return new Promise(resolve => callDependencies(id, context).then(
+    () => generator().then(result => resolve(result))
+  ));
 };
 
 

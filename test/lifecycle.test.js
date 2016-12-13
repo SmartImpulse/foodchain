@@ -1,5 +1,6 @@
 const foodchain = require('./foodchain');
 const {assert} = require('chai');
+const sinon = require('sinon');
 
 const request = generator => (
   context => ({
@@ -26,8 +27,25 @@ describe('define', () => {
       request: request(context => context.message),
     });
 
-    foodchain('foo', {message: 'foobar'}).then(_(({message}) => {
-      assert.equal('foobar', 'foobar');
+    foodchain('foo', {message: 'foobar'}).then(_(message => {
+      assert.equal(message, 'foobar');
+      done();
+    }))
+  });
+
+  it('should call dependencies too', done => {
+    const listener = sinon.spy();
+
+    foodchain.define('foo', {
+      request: request(listener),
+    });
+
+    foodchain.define(['foo'], 'bar', {
+      request: request(context => context.message),
+    });
+
+    foodchain('bar', {message: 'foobar'}).then(_(() => {
+      assert(listener.called);
       done();
     }))
   });

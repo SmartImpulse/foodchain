@@ -4,10 +4,24 @@ class Request {
 
   constructor(generator) {
     this.generator = generator;
+    this.promise = null;
   }
 
   exec(context) {
     return this.generator(context);
+  }
+
+  resolve(context) {
+    if (!this.promise) {
+      this.promise = new Promise((resolve, reject) => this.exec(context).end((err, res) => {
+        if (!!err) return reject(err);
+
+        resolve(res.body);
+        this.promise = null;
+      }));
+    }
+
+    return this.promise;
   }
 
 }
