@@ -1,6 +1,6 @@
 {
   "name": "foodchain",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Describe resources as promise dependencies",
   "main": "lib",
   "scripts": {
@@ -46,6 +46,7 @@
     "eslint-plugin-jsx-a11y": "1.5.3",
     "eslint-plugin-react": "5.2.2",
     "mocha": "2.5.3",
+    "nock": "9.0.2",
     "sinon": "1.17.4"
   },
   "babel": {

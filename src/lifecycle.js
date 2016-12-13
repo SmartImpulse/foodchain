@@ -11,7 +11,7 @@ const boolAccessor = spec => {
   return () => spec;
 };
 
-const proxy = (id, spec) => ({
+const proxy = (id, spec = {}) => ({
   factory: createFactory(spec.factory),
   request: createRequest(id, spec.request),
   shouldUsePromise: boolAccessor(spec.shouldUsePromise),
@@ -41,7 +41,7 @@ const callDependencies = (id, context) => Promise.all(
   resolveDependencies(id, context).map(generator => generator())
 );
 
-const exec = (id, context) => {
+const exec = (id, context = {}) => {
   const generator = createGenerator(id, context);
 
   return new Promise(resolve => callDependencies(id, context).then(
@@ -53,7 +53,7 @@ const exec = (id, context) => {
 const define = (...args) => {
   let dependencies = [];
   let id = null;
-  let spec = null;
+  let spec = [];
 
   if (Array.isArray(args[0])) {
     dependencies = args[0];

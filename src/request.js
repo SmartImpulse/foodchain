@@ -64,7 +64,7 @@ const createRequest = (id, spec) => {
   let generator = spec;
 
   if (!spec) throw new NoRequest(id);
-  if (spec instanceof Request) return spec;
+  if (!!spec.prototype && spec.prototype instanceof Request) return spec;
   if (spec instanceof superagent.Request) generator = () => spec;
 
   return class extends Request {
