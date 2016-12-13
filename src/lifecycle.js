@@ -4,16 +4,25 @@ const {createRequest} = require('./request');
 const def = {};
 
 
+const boolAccessor = spec => {
+  if (!spec) return () => false;
+  if (typeof spec === 'function') return spec;
+
+  return () => spec;
+};
+
 const proxy = (id, spec) => ({
   factory: createFactory(spec.factory),
   request: createRequest(id, spec.request),
+  shouldUsePromise: boolAccessor(spec.shouldUsePromise),
+  shouldSavePromise: boolAccessor(spec.shouldSavePromise),
 });
 
 const createGenerator = (id, context) => {
   const {spec} = def[id];
   const request = spec.factory.getOrCreate(context, spec.request);
 
-  return () => request.resolve(context);
+  return () => request.resolve(spec, context);
 };
 
 const resolveDependencies = (id, context) => {

@@ -5,21 +5,40 @@ class Request {
   constructor(generator) {
     this.generator = generator;
     this.promise = null;
+    this.persistentPromise = null;
   }
 
   exec(context) {
     return this.generator(context);
   }
 
-  resolve(context) {
-    if (!this.promise) {
-      this.promise = new Promise((resolve, reject) => this.exec(context).end((err, res) => {
-        if (!!err) return reject(err);
+  generatePromise(spec, context) {
+    const promise = new Promise((resolve, reject) => (
+      setTimeout(() => {
+        this.exec(context).end((err, res) => {
+          this.promise = null;
 
-        resolve(res.body);
-        this.promise = null;
-      }));
-    }
+          if (!!err) return reject(err);
+
+          resolve(res.body);
+
+          if (spec.shouldSavePromise(context, res)) {
+            this.persistentPromise = promise;
+          }
+        });
+      }, 0)
+    ));
+
+    return promise;
+  }
+
+  usePersistentPromise(spec, context) {
+    return !!this.persistentPromise && spec.shouldUsePromise(context);
+  }
+
+  resolve(spec, context) {
+    if (this.usePersistentPromise(spec, context)) return this.persistentPromise;
+    if (!this.promise) this.promise = this.generatePromise(spec, context);
 
     return this.promise;
   }
@@ -53,4 +72,4 @@ const createRequest = (id, spec) => {
 };
 
 
-module.exports = {createRequest};
+module.exports = {Request, createRequest};
