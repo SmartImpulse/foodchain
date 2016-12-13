@@ -1,4 +1,4 @@
-const request = require('superagent');
+const superagent = require('superagent');
 
 class Request {
 
@@ -22,7 +22,7 @@ class Request {
 
           resolve(res.body);
 
-          if (spec.shouldSavePromise(context, res)) {
+          if (this.shouldSavePromise(spec, context, res)) {
             this.persistentPromise = promise;
           }
         });
@@ -32,12 +32,16 @@ class Request {
     return promise;
   }
 
-  usePersistentPromise(spec, context) {
+  shouldSavePromise(spec, context, res) {
+    return spec.shouldSavePromise(context, res);
+  }
+
+  shouldUsePromise(spec, context) {
     return !!this.persistentPromise && spec.shouldUsePromise(context);
   }
 
   resolve(spec, context) {
-    if (this.usePersistentPromise(spec, context)) return this.persistentPromise;
+    if (this.shouldUsePromise(spec, context)) return this.persistentPromise;
     if (!this.promise) this.promise = this.generatePromise(spec, context);
 
     return this.promise;
@@ -60,7 +64,8 @@ const createRequest = (id, spec) => {
   let generator = spec;
 
   if (!spec) throw new NoRequest(id);
-  if (spec instanceof request.Request) generator = () => spec;
+  if (spec instanceof Request) return spec;
+  if (spec instanceof superagent.Request) generator = () => spec;
 
   return class extends Request {
 

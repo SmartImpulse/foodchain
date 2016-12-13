@@ -73,4 +73,27 @@ describe('define', () => {
       }))
   });
 
+  it('should save persistent promise using methods', done => {
+    const listener = sinon.spy();
+    const requestSpy = () => ({
+      end: callback => {
+        listener();
+        return callback(null, {body: []});
+      }
+    });
+
+    foodchain.define('foo', {
+      request: requestSpy,
+      shouldSavePromise: () => true,
+      shouldUsePromise: () => true,
+    });
+
+    foodchain('foo', {message: 'foobar'})
+      .then(() => foodchain('foo', {message: 'foobar'}))
+      .then(_(() => {
+        assert(listener.calledOnce);
+        done();
+      }))
+  });
+
 });
