@@ -156,4 +156,30 @@ describe('integration', () => {
 
   });
 
+  it('should use the factory', done => {
+    const spy = sinon.spy();
+
+    foodchain.define('get:user', {
+      factory: ({userId}) => userId,
+      request: class extends foodchain.Request {
+        constructor(...args) {
+          super(...args);
+        }
+
+        exec({userId}) {
+          spy();
+          return foodchain.request.get(`http://example.com/users/${userId}`)
+        }
+      },
+    });
+
+    foodchain('get:user', {userId: 1})
+      .then(foodchain('get:user', {userId: 1}))
+      .then(foodchain('get:user', {userId: 2}))
+      .then(foodchain('get:user', {userId: 2}))
+      .then(_(() => {
+        assert.equal(spy.callCount, 2);
+        done();
+      }));
+  });
 })
