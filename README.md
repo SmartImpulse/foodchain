@@ -21,4 +21,6 @@ const showUser = async userId => {
 };
 ```
 
-With this setup: **showUser** will fetch and **log after first call** and **only log after other calls**.
+With this setup: **showUser** will 
+ * **fetch and log after first call** and
+ * **only log after other calls**
