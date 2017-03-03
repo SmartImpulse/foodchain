@@ -1,27 +1,24 @@
 # foodchain
-Describe resource dependencies
+
+## Usage
+
+Call request just once.
+
 
 ```js
 const {request, define} = require('foodchain');
-const renameKeys = require('object-rename-keys');
 
-const bootTime = Date.now();
-const resultsExpire = duration => ({
+define('get:user', {
   shouldSaveResult: true,
-  shouldUseResult: () => Date.now() - bootTime < duration,
-});
-
-define('get:user', Object.assign({
+  shouldUseResult: true,
   factory: ({userId}) => `user-${userId}`,
   request: ({userId}) => request.get(`/api/users/${userId}`),
-}, resultsExpire(60000)));
+});
 
+const showUser = async userId => {
+  const user = await foodchain('get:user', {userId: 'ae563h7e'});
+  console.log(user);
+};
+```
 
-define(['get:user'], 'get:user-products', {
-  factory: ({userId}) => `products-${userId}`,
-  request: ({userId}) => request.get(`/api/users/${userId}/products`),
-}, resultsExpire(10000)));
-
-foodchain('get:user-products', {userId: 'ae563h7e'}).then(products => products.forEach(
-  product => console.log(product.sid)
-));
+With this setup: **showUser** will fetch and **log after first call** and **only log after other calls**.
